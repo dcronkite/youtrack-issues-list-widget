@@ -61,7 +61,7 @@
 }
 
 .issues-list-widget__colored-field-wide {
-  position: absolute;
+  /*position: absolute;*/
   top: 6px;
 
   display: inline-block;

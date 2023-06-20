@@ -115,7 +115,7 @@ class IssueLine extends React.Component {
     return makeColorFieldPresentationObject(fieldWithColoredValues);
   }
 
-  static getColoredSquareModelSubsystem(issue, index) {
+  static getColoredSquareModelSubsystem(issue, targetFieldName, index) {
 
     const makeColorFieldPresentationObject = issueField => {
       const coloredValue = IssueLine.toArray(issueField.value).filter(
@@ -142,7 +142,7 @@ class IssueLine extends React.Component {
     const subsystemField = bundleFields.filter(
       issueField => {
         const field = issueField.projectCustomField.field || {};
-        return (field.name || '').toLowerCase() === 'subsystem';
+        return (field.name || '').toLowerCase() === targetFieldName;
       }
     )[index];
     if (subsystemField) {
@@ -187,9 +187,11 @@ class IssueLine extends React.Component {
       expanded,
       coloredSquare: IssueLine.getColoredSquareModel(issue),
       valuableFields: IssueLine.getValuableIssueFields(issue),
-      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 0),
-      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 1),
-      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 2)
+      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 0),
+      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 1),
+      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 2),
+      vmSquare1: IssueLine.getColoredSquareModelSubsystem(issue, 'vm', 0),
+      vmSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 'vm', 1),
     };
   }
 
@@ -200,9 +202,11 @@ class IssueLine extends React.Component {
       expanded,
       coloredSquare: IssueLine.getColoredSquareModel(issue),
       valuableFields: IssueLine.getValuableIssueFields(issue),
-      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 0),
-      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 1),
-      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 2)
+      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 0),
+      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 1),
+      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 'subsystem', 2),
+      vmSquare1: IssueLine.getColoredSquareModelSubsystem(issue, 'vm', 0),
+      vmSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 'vm', 1),
     };
   }
 
@@ -267,6 +271,8 @@ class IssueLine extends React.Component {
       subsystemSquare,
       subsystemSquare2,
       subsystemSquare3,
+      vmSquare1,
+      vmSquare2,
       expanded,
       highlighted
     } = this.state;
@@ -375,6 +381,36 @@ class IssueLine extends React.Component {
                 title={this.renderFields([subsystemSquare3.issueField], true)}
               >
                 {subsystemSquare3.name}
+              </Tooltip>
+            </span>
+          )
+        }
+        {
+          vmSquare1 &&
+          (
+            <span
+              className={'issues-list-widget__colored-field-wide'}
+              style={vmSquare1.style}
+            >
+              <Tooltip
+                title={this.renderFields([vmSquare1.issueField], true)}
+              >
+                {vmSquare1.name}
+              </Tooltip>
+            </span>
+          )
+        }
+        {
+          vmSquare2 &&
+          (
+            <span
+              className={'issues-list-widget__colored-field-wide'}
+              style={vmSquare2.style}
+            >
+              <Tooltip
+                title={this.renderFields([vmSquare2.issueField], true)}
+              >
+                {vmSquare2.name}
               </Tooltip>
             </span>
           )
