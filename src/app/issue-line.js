@@ -115,6 +115,52 @@ class IssueLine extends React.Component {
     return makeColorFieldPresentationObject(fieldWithColoredValues);
   }
 
+  static getColoredSquareModelSubsystem(issue, index) {
+
+    const makeColorFieldPresentationObject = issueField => {
+      const coloredValue = IssueLine.toArray(issueField.value).filter(
+        IssueLine.isColoredValue
+      )[index];
+      if (!coloredValue) {
+        return null;
+      }
+      const fieldName = IssueLine.getName(
+        issueField.projectCustomField.field || {}
+      );
+      return {
+        style: IssueLine.fieldColorToCss(coloredValue.color),
+        letter: IssueLine.getFirstLetter(coloredValue),
+        name: IssueLine.getName(coloredValue),
+        title: `${fieldName}: ${IssueLine.getName(coloredValue)}`,
+        issueField
+      };
+    };
+
+    const bundleFields = (issue.fields || []).filter(
+      issueField => !!issueField.projectCustomField.bundle
+    );
+    const subsystemField = bundleFields.filter(
+      issueField => {
+        const field = issueField.projectCustomField.field || {};
+        return (field.name || '').toLowerCase() === 'subsystem';
+      }
+    )[index];
+    if (subsystemField) {
+      if (subsystemField.value) {
+        return makeColorFieldPresentationObject(subsystemField);
+      }
+      return null;
+    }
+    const fieldWithColoredValues = (issue.fields || []).filter(
+      field =>
+        IssueLine.toArray(field.value || []).some(IssueLine.isColoredValue)
+    )[index];
+    if (!fieldWithColoredValues) {
+      return null;
+    }
+    return makeColorFieldPresentationObject(fieldWithColoredValues);
+  }
+
   static onOpenIssue = evt =>
     evt.stopPropagation();
 
@@ -140,7 +186,10 @@ class IssueLine extends React.Component {
       issue,
       expanded,
       coloredSquare: IssueLine.getColoredSquareModel(issue),
-      valuableFields: IssueLine.getValuableIssueFields(issue)
+      valuableFields: IssueLine.getValuableIssueFields(issue),
+      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 0),
+      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 1),
+      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 2)
     };
   }
 
@@ -150,7 +199,10 @@ class IssueLine extends React.Component {
       issue,
       expanded,
       coloredSquare: IssueLine.getColoredSquareModel(issue),
-      valuableFields: IssueLine.getValuableIssueFields(issue)
+      valuableFields: IssueLine.getValuableIssueFields(issue),
+      subsystemSquare: IssueLine.getColoredSquareModelSubsystem(issue, 0),
+      subsystemSquare2: IssueLine.getColoredSquareModelSubsystem(issue, 1),
+      subsystemSquare3: IssueLine.getColoredSquareModelSubsystem(issue, 2)
     };
   }
 
@@ -162,23 +214,23 @@ class IssueLine extends React.Component {
         {IssueLine.getValuePresentation(issueField, this.props.dateFormats)}
         {
           firstValue.avatarUrl &&
-        (
-          <img
-            className="issues-list-widget__field-avatar"
-            src={firstValue.avatarUrl}
-          />
-        )
+          (
+            <img
+              className="issues-list-widget__field-avatar"
+              src={firstValue.avatarUrl}
+            />
+          )
         }
         {
           IssueLine.isColoredValue(firstValue) &&
-        (
-          <span
-            className="issues-list-widget__field-color issues-list-widget__colored-field"
-            style={IssueLine.fieldColorToCss(firstValue.color)}
-          >
-            {IssueLine.getFirstLetter(firstValue)}
-          </span>
-        )
+          (
+            <span
+              className="issues-list-widget__field-color issues-list-widget__colored-field"
+              style={IssueLine.fieldColorToCss(firstValue.color)}
+            >
+              {IssueLine.getFirstLetter(firstValue)}
+            </span>
+          )
         }
       </div>
     );
@@ -212,6 +264,9 @@ class IssueLine extends React.Component {
       issue,
       coloredSquare,
       valuableFields,
+      subsystemSquare,
+      subsystemSquare2,
+      subsystemSquare3,
       expanded,
       highlighted
     } = this.state;
@@ -242,18 +297,18 @@ class IssueLine extends React.Component {
       >
         {
           coloredSquare &&
-        (
-          <span
-            className={'issues-list-widget__colored-field'}
-            style={coloredSquare.style}
-          >
-            <Tooltip
-              title={this.renderFields([coloredSquare.issueField], true)}
+          (
+            <span
+              className={'issues-list-widget__colored-field'}
+              style={coloredSquare.style}
             >
-              {coloredSquare.letter}
-            </Tooltip>
-          </span>
-        )
+              <Tooltip
+                title={this.renderFields([coloredSquare.issueField], true)}
+              >
+                {coloredSquare.letter}
+              </Tooltip>
+            </span>
+          )
         }
         <div
           className="issues-list-widget__issue-info"
@@ -279,6 +334,51 @@ class IssueLine extends React.Component {
             {issue.summary}
           </Link>
         </div>
+        {
+          subsystemSquare &&
+          (
+            <span
+              className={'issues-list-widget__colored-field-wide'}
+              style={subsystemSquare.style}
+            >
+              <Tooltip
+                title={this.renderFields([subsystemSquare.issueField], true)}
+              >
+                {subsystemSquare.name}
+              </Tooltip>
+            </span>
+          )
+        }
+        {
+          subsystemSquare2 &&
+          (
+            <span
+              className={'issues-list-widget__colored-field-wide'}
+              style={subsystemSquare2.style}
+            >
+              <Tooltip
+                title={this.renderFields([subsystemSquare2.issueField], true)}
+              >
+                {subsystemSquare2.name}
+              </Tooltip>
+            </span>
+          )
+        }
+        {
+          subsystemSquare3 &&
+          (
+            <span
+              className={'issues-list-widget__colored-field-wide'}
+              style={subsystemSquare3.style}
+            >
+              <Tooltip
+                title={this.renderFields([subsystemSquare3.issueField], true)}
+              >
+                {subsystemSquare3.name}
+              </Tooltip>
+            </span>
+          )
+        }
         <div className="issues-list-widget__issue-toggler">
           {
             expanded
@@ -298,14 +398,14 @@ class IssueLine extends React.Component {
         </div>
         {
           expanded &&
-        (
-          <div
-            className="issues-list-widget__issue-expanded-block"
-            data-test="issue-line-expanded-block"
-          >
-            {this.renderFields(valuableFields)}
-          </div>
-        )
+          (
+            <div
+              className="issues-list-widget__issue-expanded-block"
+              data-test="issue-line-expanded-block"
+            >
+              {this.renderFields(valuableFields)}
+            </div>
+          )
         }
       </div>
     );
