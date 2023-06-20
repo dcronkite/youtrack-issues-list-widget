@@ -1,3 +1,8 @@
+Fork Changes:
+
+* In issues list, show subsystem (with color) on the issue line without having to expand the issue
+  * This is easily customizable to insert other elements too
+
 # YouTrack Issues List Widget
 
 [![JetBrains team project](http://jb.gg/badges/team.svg)](https://confluence.jetbrains.com/display/ALL/JetBrains+on+GitHub)
